@@ -1,0 +1,42 @@
+{
+    "name": "PMWArr",
+    "version": "1.0.0",
+    "type": "module",
+    "scripts": {
+        "dev": "tsx --watch src/server.ts",
+        "start": "node dist/server.js",
+        "build": "tsc",
+        "type-check": "tsc --noEmit",
+        "lint": "eslint .",
+        "lint:fix": "eslint --fix .",
+        "format": "prettier --write .",
+        "format:check": "prettier --check ."
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "description": "",
+    "dependencies": {
+        "axios": "^1.9.0",
+        "cors": "^2.8.5",
+        "dotenv": "^16.5.0",
+        "express": "^5.1.0",
+        "pino": "^9.6.0",
+        "sqlite3": "^5.1.7",
+        "zod": "^3.24.3"
+    },
+    "devDependencies": {
+        "@eslint/js": "^9.28.0",
+        "@tsconfig/node22": "^22.0.1",
+        "@types/cors": "^2.8.17",
+        "@types/express": "^5.0.1",
+        "@types/node": "^22.14.1",
+        "eslint": "^9.28.0",
+        "eslint-plugin-perfectionist": "^4.12.2",
+        "globals": "^16.2.0",
+        "prettier": "^3.5.3",
+        "tsx": "^4.19.3",
+        "typescript": "^5.8.3",
+        "typescript-eslint": "^8.33.1"
+    }
+}
