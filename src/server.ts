@@ -7,14 +7,19 @@ import { logger } from './utils/logger.util.js';
 import { errorHandler, notFoundHandler } from './middleware/error.middleware.js';
 import { loggerMiddleware } from './middleware/log.middleware.js';
 import { runMigrations } from './db/migrations.db.js';
+import { SchedulerService } from './services/scheduler.service.js';
 
 import vodRoute from './routes/vod.route.js';
+import syncRoute from './routes/sync.route.js';
 
 const startServer = async () => {
     const app = express();
 
     // Initialize the database and run migrations
     await runMigrations();
+
+    // Initialize the download job
+    await SchedulerService.scheduleDownloadJob();
 
     // Resolve __dirname equivalent
     const __filename = fileURLToPath(import.meta.url);
@@ -30,13 +35,14 @@ const startServer = async () => {
 
     // Set up routes
     app.use('/api/vods/', vodRoute);
+    app.use('/api/sync/', syncRoute);
 
     // Add error handling middleware
     app.use(notFoundHandler);
     app.use(errorHandler);
 
     // Run the server
-    app.listen(config.PORT, () => logger.info({ message: `Server is running on port ${config.PORT}` }));
+    app.listen(config.PORT, () => logger.info(`Server is running on port ${config.PORT}`));
 };
 
 // Start the server

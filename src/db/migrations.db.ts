@@ -19,7 +19,7 @@ export async function runMigrations(): Promise<void> {
         fileSize INTEGER NOT NULL,
         videoFileLocation TEXT,
         state INTEGER NOT NULL,
-        updatedAt DATETIME NOT NULL,
+        updatedAt DATETIME NOT NULL
     );
     `,
         (err) => {

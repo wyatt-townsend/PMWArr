@@ -1,12 +1,5 @@
 import { HttpStatusCode, ErrorCode } from './codes.util.js';
 
-/**
- * Custom error class for handling application errors.
- * @extends Error
- * @property {string} message - Error message
- * @property {number} statusCode - HTTP status code
- * @property {string} code - Custom error code
- */
 export class AppError extends Error {
     public statusCode: HttpStatusCode;
     public code: ErrorCode;

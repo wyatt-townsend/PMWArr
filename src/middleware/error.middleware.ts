@@ -33,6 +33,8 @@ export function errorHandler(err: AppError, req: Request, res: Response, next: N
             message: 'Something went wrong',
         });
     }
+
+    next();
 }
 
 /**

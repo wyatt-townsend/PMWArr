@@ -15,7 +15,7 @@ export function loggerMiddleware(req: Request, res: Response, next: NextFunction
         const { statusCode } = res;
 
         logger.info({
-            message: 'Request completed',
+            msg: 'Request completed',
             method: method,
             url: originalUrl,
             statusCode: statusCode,

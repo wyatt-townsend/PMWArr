@@ -3,7 +3,6 @@ import { Request, Response, NextFunction } from 'express';
 import { AppError } from '../utils/error.utils.js';
 import { HttpStatusCode, ErrorCode } from '../utils/codes.util.js';
 import VodService from '../services/vod.service.js';
-import { Vod, VodState } from '../models/vod.model.js';
 
 const idSchema = z
     .object({

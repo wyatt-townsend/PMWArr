@@ -45,7 +45,7 @@ class VodRepo {
 
     async create(vodDto: VodDto): Promise<Vod> {
         const query =
-            'INSERT INTO vods (title, description, url, aired, published, fileSize, videoFileLocation, state, updatedAt) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)';
+            'INSERT INTO vods (title, url, aired, published, fileSize, videoFileLocation, state, updatedAt) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
 
         const createdTime = new Date();
 
