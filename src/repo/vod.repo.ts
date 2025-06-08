@@ -2,7 +2,7 @@ import sqlite3 from 'sqlite3';
 import { getDatabaseConnection } from '../db/connection.db.js';
 import { logger } from '../utils/logger.util.js';
 import { AppError } from '../utils/error.utils.js';
-import { Vod, VodDto, VodState } from '../models/vod.model.js';
+import { Vod, VodDto } from '../models/vod.model.js';
 
 class VodRepo {
     private db: sqlite3.Database;
@@ -52,7 +52,7 @@ class VodRepo {
         return new Promise((resolve, reject) => {
             this.db.run(
                 query,
-                [vodDto.title, vodDto.url, vodDto.aired, vodDto.published, vodDto.fileSize, undefined, VodState.Queued, createdTime],
+                [vodDto.title, vodDto.url, vodDto.aired, vodDto.published, vodDto.fileSize, undefined, vodDto.state, createdTime],
                 function (err) {
                     if (err) {
                         logger.error(err.message);
@@ -66,7 +66,7 @@ class VodRepo {
                             published: vodDto.published,
                             fileSize: vodDto.fileSize,
                             videoFileLocation: undefined,
-                            state: VodState.Queued,
+                            state: vodDto.state,
                             updatedAt: createdTime,
                         });
                     }

@@ -1,5 +1,6 @@
 enum VodState {
     Error = 'error',
+    Discovered = 'discovered',
     Queued = 'queued',
     Downloading = 'downloading',
     Downloaded = 'downloaded',
@@ -17,5 +18,5 @@ interface Vod {
     updatedAt: Date;
 }
 
-type VodDto = Omit<Vod, 'id' | 'state' | 'videoFileLocation' | 'updatedAt'>;
+type VodDto = Omit<Vod, 'id' | 'videoFileLocation' | 'updatedAt'>;
 export { VodState, Vod, VodDto };

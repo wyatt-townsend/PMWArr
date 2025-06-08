@@ -10,7 +10,7 @@ import { runMigrations } from './db/migrations.db.js';
 import { SchedulerService } from './services/scheduler.service.js';
 
 import vodRoute from './routes/vod.route.js';
-import syncRoute from './routes/sync.route.js';
+import syncRoute from './routes/job.route.js';
 
 const startServer = async () => {
     const app = express();
@@ -35,7 +35,7 @@ const startServer = async () => {
 
     // Set up routes
     app.use('/api/vods/', vodRoute);
-    app.use('/api/sync/', syncRoute);
+    app.use('/api/job/', syncRoute);
 
     // Add error handling middleware
     app.use(notFoundHandler);

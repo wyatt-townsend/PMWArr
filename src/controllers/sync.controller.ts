@@ -2,36 +2,51 @@ import { z } from 'zod';
 import { Request, Response, NextFunction } from 'express';
 import { AppError } from '../utils/error.utils.js';
 import { HttpStatusCode, ErrorCode } from '../utils/codes.util.js';
-import { JobService } from '../services/job.service.js';
+import JobService from '../services/job.service.js';
 
-// Schema for validating optional date in query
-const dateSchema = z
+const optionSchema = z
     .object({
-        date: z.string().optional(),
+        date: z
+            .string()
+            .optional()
+            .default(() => new Date().toISOString()),
+        download: z
+            .string()
+            .transform((value) => {
+                if (value === 'true') {
+                    return true;
+                } else if (value === 'false') {
+                    return false;
+                } else {
+                    throw new AppError(
+                        `Invalid query param: 'download' must be 'true' or 'false'`,
+                        HttpStatusCode.BAD_REQUEST,
+                        ErrorCode.VALIDATION_ERROR,
+                    );
+                }
+            })
+            .optional(),
     })
     .strict();
 
 const startSyncJob = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-    const result = dateSchema.safeParse(req.query);
-
-    if (!result.success) {
-        return next(
-            new AppError(`Invalid query param: ${JSON.stringify(result.error.flatten())}`, HttpStatusCode.BAD_REQUEST, ErrorCode.VALIDATION_ERROR),
-        );
-    }
-
-    let targetDate: Date | undefined = undefined;
-    if (result.data.date) {
-        const parsed = new Date(result.data.date);
-        if (isNaN(parsed.getTime())) {
-            return next(new AppError(`Invalid date format: ${result.data.date}`, HttpStatusCode.BAD_REQUEST, ErrorCode.VALIDATION_ERROR));
-        }
-        targetDate = parsed;
-    }
-
     try {
-        const vods = await JobService.doSyncJob(targetDate);
-        res.status(HttpStatusCode.OK).json(vods);
+        const result = optionSchema.safeParse(req.query);
+
+        if (!result.success) {
+            return next(
+                new AppError(
+                    `Invalid query param: ${JSON.stringify(result.error.flatten())}`,
+                    HttpStatusCode.BAD_REQUEST,
+                    ErrorCode.VALIDATION_ERROR,
+                ),
+            );
+        }
+        console.log(result.data);
+
+        const download = result.data.download ?? true; // Default to true if not provided
+        const vods = await JobService.doSyncJob(new Date(result.data.date), download);
+        res.status(HttpStatusCode.CREATED).json(vods);
     } catch (err) {
         return next(err);
     }

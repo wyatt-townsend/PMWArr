@@ -6,12 +6,8 @@ import VodService from '../services/vod.service.js';
 import PMWService from './pmw.service.js';
 import { Vod, VodState } from '../models/vod.model.js';
 
-export class JobService {
-    static async doSyncJob(target?: Date): Promise<Vod[]> {
-        if (!target) {
-            target = new Date();
-        }
-
+class JobService {
+    static async doSyncJob(target: Date, download: boolean): Promise<Vod[]> {
         logger.debug(`Starting sync job for target date: ${target.toISOString()}`);
 
         try {
@@ -23,8 +19,13 @@ export class JobService {
 
             for (const vodDto of vods) {
                 try {
+                    if (download) {
+                        vodDto.state = VodState.Queued;
+                    }
+
                     const vod = await vodService.createVod(vodDto);
                     ret.push(vod);
+
                     logger.trace(`Created VOD with ID: ${vod.id}`);
                 } catch (error) {
                     logger.debug(`Failed to create VOD: ${error.message}`);
@@ -44,7 +45,7 @@ export class JobService {
         try {
             const target = await vodService.findVodById(id);
 
-            if (target.state !== VodState.Queued && target.state !== VodState.Error) {
+            if (target.state !== VodState.Queued) {
                 logger.warn(`VOD with ID ${target.id} is not in a queued state, skipping download.`);
                 return;
             }
@@ -72,3 +73,5 @@ export class JobService {
         }
     }
 }
+
+export default JobService;
