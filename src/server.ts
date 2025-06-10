@@ -7,10 +7,12 @@ import { logger } from './utils/logger.util.js';
 import { errorHandler, notFoundHandler } from './middleware/error.middleware.js';
 import { loggerMiddleware } from './middleware/log.middleware.js';
 import { runMigrations } from './db/migrations.db.js';
-import { SchedulerService } from './services/scheduler.service.js';
+import settingsService from './services/settings.service.js';
+import schedulerService from './services/scheduler.service.js';
 
 import vodRoute from './routes/vod.route.js';
-import syncRoute from './routes/job.route.js';
+import jobRoute from './routes/job.route.js';
+import settingsRoute from './routes/settings.route.js';
 
 const startServer = async () => {
     const app = express();
@@ -18,8 +20,10 @@ const startServer = async () => {
     // Initialize the database and run migrations
     await runMigrations();
 
-    // Initialize the download job
-    await SchedulerService.scheduleDownloadJob();
+    // Initialize the jobs
+    const settings = await settingsService.getSettings();
+    schedulerService.scheduleDownloadJob('*/10 * * * * *'); // Every 10 seconds
+    schedulerService.scheduleSyncJob(settings.sync_schedule);
 
     // Resolve __dirname equivalent
     const __filename = fileURLToPath(import.meta.url);
@@ -35,7 +39,8 @@ const startServer = async () => {
 
     // Set up routes
     app.use('/api/vods/', vodRoute);
-    app.use('/api/job/', syncRoute);
+    app.use('/api/job/', jobRoute);
+    app.use('/api/settings/', settingsRoute);
 
     // Add error handling middleware
     app.use(notFoundHandler);

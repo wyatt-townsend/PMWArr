@@ -21,6 +21,8 @@ const enqueueDownload = async (req: Request, res: Response, next: NextFunction):
     }
 
     try {
+        // We only mark the vode as ready for download, the actual download will be handled
+        // by the job service in the background.
         const vodService = new VodService();
         const vod = await vodService.findVodById(result.data.id);
 
@@ -29,7 +31,7 @@ const enqueueDownload = async (req: Request, res: Response, next: NextFunction):
             await vodService.updateVod(vod);
         }
 
-        res.status(HttpStatusCode.CREATED).json(vod);
+        res.status(HttpStatusCode.ACCEPTED).json(vod);
     } catch (err) {
         return next(err);
     }

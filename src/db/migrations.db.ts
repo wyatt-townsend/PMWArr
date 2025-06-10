@@ -29,5 +29,21 @@ export async function runMigrations(): Promise<void> {
         },
     );
 
+    // Create the settings table if it doesn't exist
+    db.exec(
+        `
+    CREATE TABLE IF NOT EXISTS settings (
+        id INTEGER PRIMARY KEY CHECK (id = 1),
+        auto_download BOOLEAN NOT NULL,
+        sync_schedule TEXT NOT NULL
+    );
+    `,
+        (err) => {
+            if (err) {
+                logger.error('Error creating vods table: ' + err.message);
+            }
+        },
+    );
+
     db.close();
 }
