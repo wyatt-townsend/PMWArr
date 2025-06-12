@@ -13,6 +13,7 @@ export async function runMigrations(): Promise<void> {
     CREATE TABLE IF NOT EXISTS vods (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         title TEXT NOT NULL,
+        part INTEGER CHECK (part >= 0),
         url TEXT UNIQUE NOT NULL,
         aired DATETIME NOT NULL,
         published DATETIME NOT NULL,

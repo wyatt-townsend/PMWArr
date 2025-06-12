@@ -138,3 +138,4 @@ dist
 # Project specific
 *.sqlite3
 *.txt
+media

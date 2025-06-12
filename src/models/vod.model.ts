@@ -9,6 +9,7 @@ enum VodState {
 interface Vod {
     readonly id: number;
     readonly title: string;
+    readonly part?: number;
     readonly url: string;
     readonly aired: Date;
     readonly published: Date;

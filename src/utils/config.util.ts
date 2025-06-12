@@ -8,10 +8,9 @@ dotenv.config({ path: path.resolve(process.cwd(), '.env') });
 
 const ConfigSchema = z.object({
     PORT: z.coerce.number().default(3000),
-    DATA_DIR: z.string(),
     LOG_LEVEL: z.string().optional().default('info'),
-    WORKERS: z.coerce.number().optional().default(4),
-    JOB_POLL_INTERVAL_MS: z.coerce.number().optional().default(2000), // 2 seconds
+    CONFIG_DIR: z.string(),
+    MEDIA_DIR: z.string(),
 });
 
 // Validate and parse config
@@ -23,10 +22,10 @@ if (!parsed.success) {
 }
 
 /**
- * Configuration object for the application
- * @property {number} PORT - The port the server will run on
- * @property {string} DATA_DIR - The folder where data will be stored
- * @property {string} LOG_LEVEL - The logging level for the application
- * @property {number} WORKERS - The max number of worker threads to spawn
+ * Application configuration object.
+ * @property {number} PORT - The port the application listens on.
+ * @property {string} LOG_LEVEL - The logging level (e.g., 'info', 'debug').
+ * @property {string} CONFIG_DIR - The directory for configuration files.
+ * @property {string} MEDIA_DIR - The directory for media files.
  */
 export const config = parsed.data;

@@ -10,6 +10,13 @@ class SettingsRepo {
         this.db = getDatabaseConnection();
     }
 
+    private parseSettings(row: Settings): Settings {
+        return {
+            auto_download: Boolean(row.auto_download),
+            sync_schedule: row.sync_schedule,
+        };
+    }
+
     async get(): Promise<Settings> {
         const query = 'SELECT * FROM settings WHERE id = ?';
 
@@ -21,10 +28,7 @@ class SettingsRepo {
                 } else if (!row) {
                     resolve(undefined);
                 } else {
-                    resolve({
-                        auto_download: Boolean(row.auto_download),
-                        sync_schedule: row.sync_schedule,
-                    });
+                    resolve(this.parseSettings(row));
                 }
             });
         });
@@ -45,10 +49,7 @@ class SettingsRepo {
                     logger.error(err.message);
                     reject(err);
                 } else {
-                    resolve({
-                        auto_download: Boolean(settings.auto_download),
-                        sync_schedule: settings.sync_schedule,
-                    });
+                    resolve(settings);
                 }
             });
         });

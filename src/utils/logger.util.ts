@@ -7,7 +7,7 @@ const transport = pino.transport({
         {
             level: config.LOG_LEVEL,
             target: 'pino/file',
-            options: { destination: `${config.DATA_DIR}/app.log` },
+            options: { destination: `${config.CONFIG_DIR}/app.log` },
         },
         {
             level: config.LOG_LEVEL,

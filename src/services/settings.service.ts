@@ -12,10 +12,18 @@ class SettingsService {
 
     async getSettings(): Promise<Settings> {
         if (!this.cache) {
-            this.cache = (await this.settingsRepo.get()) ?? {
-                auto_download: true,
-                sync_schedule: '0 6 * * *',
-            };
+            try {
+                this.cache = (await this.settingsRepo.get()) ?? {
+                    auto_download: true,
+                    sync_schedule: '0 6 * * *',
+                };
+            } catch {
+                // If there is an error fetching settings, use default values
+                this.cache = {
+                    auto_download: true,
+                    sync_schedule: '0 6 * * *',
+                };
+            }
         }
         return this.cache;
     }

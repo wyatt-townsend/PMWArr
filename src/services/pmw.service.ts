@@ -1,7 +1,10 @@
 import axios from 'axios';
 import * as fs from 'fs';
 import * as cheerio from 'cheerio';
+import ffmetadata from 'ffmetadata';
+import { config } from '../utils/config.util.js';
 import { VodDto, Vod, VodState } from '../models/vod.model.js';
+import { logger } from '../utils/logger.util.js';
 
 class PMWService {
     private static url: string = 'https://archive.wubby.tv/vods/public/';
@@ -14,6 +17,18 @@ class PMWService {
         const year = date.getFullYear();
         const month = String(date.toLocaleDateString('en-US', { month: 'short' })).toLowerCase();
         return `${this.url}${month}_${year}/`;
+    }
+
+    static getFileName(vod: Vod): string {
+        let fileName: string = `PaymoneyWubby Streams - ${vod.aired.toISOString().slice(0, 10)}`;
+
+        if (vod.part !== undefined) {
+            fileName += ` - part${vod.part}`;
+        }
+
+        fileName += '.mp4';
+
+        return fileName;
     }
 
     static parseFileSize(size: string): number {
@@ -44,8 +59,8 @@ class PMWService {
         const html = response.data;
         const $ = cheerio.load(html);
 
+        let parts = 1;
         const vods: VodDto[] = [];
-
         $('tr').each((_, el) => {
             const linkTd = $(el).find('td.link');
             const sizeTd = $(el).find('td.size');
@@ -59,6 +74,7 @@ class PMWService {
 
             if (titleParts.length < 2) return; // Skip if title does not have enough parts
             const title = titleParts[1].trim();
+            const part = parts;
             const aired = new Date(target.getFullYear(), target.getMonth(), parseInt(titleParts[0].trim()));
             const link = linkTd.find('a').attr('href') || '';
             const size = this.parseFileSize(sizeTd.text().trim());
@@ -68,30 +84,53 @@ class PMWService {
 
             vods.push({
                 title: title,
+                part: part,
                 url: url + link,
                 state: VodState.Discovered,
                 aired: aired,
                 published: published,
                 fileSize: size,
             });
+
+            parts++;
         });
+
+        if (vods.length === 1) {
+            // If only one VOD is found, set part to undefined
+            vods[0] = {
+                ...vods[0],
+                part: undefined,
+            };
+        }
 
         return vods;
     }
 
     static async download(target: Vod): Promise<Vod> {
-        const filePath = `./downloads/${target.id}.mp4`;
+        const outputDirectory = `${config.MEDIA_DIR}/PaymoneyWubby Streams/${target.aired.getFullYear()}/`;
+        // Ensure the output directory exists
+        fs.mkdirSync(outputDirectory, { recursive: true });
+
+        const filePath = outputDirectory + this.getFileName(target);
+
         const writer = fs.createWriteStream(filePath);
-
         const response = await axios.get(target.url, { responseType: 'stream' });
-
         response.data.pipe(writer);
 
         return new Promise((resolve, reject) => {
             writer.on('finish', () => {
                 target.videoFileLocation = filePath;
                 target.state = VodState.Downloaded;
-                resolve(target);
+
+                // Set MP4 title metadata using ffmetadata
+                ffmetadata.write(filePath, { title: target.title }, (err) => {
+                    target.videoFileLocation = filePath;
+                    target.state = VodState.Downloaded;
+                    if (err) {
+                        logger.error('Error writing metadata:', err);
+                    }
+                    resolve(target);
+                });
             });
             writer.on('error', () => {
                 target.videoFileLocation = undefined;

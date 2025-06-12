@@ -11,6 +11,21 @@ class VodRepo {
         this.db = getDatabaseConnection();
     }
 
+    private parseVodRow(row: Vod): Vod {
+        return {
+            id: row.id,
+            title: row.title,
+            part: row.part ?? undefined,
+            url: row.url,
+            aired: new Date(row.aired),
+            published: new Date(row.published),
+            fileSize: Number(row.fileSize),
+            videoFileLocation: row.videoFileLocation ?? undefined,
+            state: row.state,
+            updatedAt: new Date(row.updatedAt),
+        };
+    }
+
     async findAll(): Promise<Vod[]> {
         const query = 'SELECT * FROM vods';
 
@@ -20,7 +35,7 @@ class VodRepo {
                     logger.error(err.message);
                     reject(err);
                 } else {
-                    resolve(rows);
+                    resolve(rows.map(this.parseVodRow));
                 }
             });
         });
@@ -37,7 +52,7 @@ class VodRepo {
                 } else if (!row) {
                     reject(new Error(`Vod with ID ${id} not found`));
                 } else {
-                    resolve(row);
+                    resolve(this.parseVodRow(row));
                 }
             });
         });
@@ -45,14 +60,14 @@ class VodRepo {
 
     async create(vodDto: VodDto): Promise<Vod> {
         const query =
-            'INSERT INTO vods (title, url, aired, published, fileSize, videoFileLocation, state, updatedAt) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
+            'INSERT INTO vods (title, part, url, aired, published, fileSize, videoFileLocation, state, updatedAt) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)';
 
         const createdTime = new Date();
 
         return new Promise((resolve, reject) => {
             this.db.run(
                 query,
-                [vodDto.title, vodDto.url, vodDto.aired, vodDto.published, vodDto.fileSize, undefined, vodDto.state, createdTime],
+                [vodDto.title, vodDto.part, vodDto.url, vodDto.aired, vodDto.published, vodDto.fileSize, undefined, vodDto.state, createdTime],
                 function (err) {
                     if (err) {
                         logger.error(err.message);
@@ -61,6 +76,7 @@ class VodRepo {
                         resolve({
                             id: this.lastID,
                             title: vodDto.title,
+                            part: vodDto.part,
                             url: vodDto.url,
                             aired: vodDto.aired,
                             published: vodDto.published,
