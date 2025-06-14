@@ -1,10 +1,41 @@
 import axios from 'axios';
 import * as fs from 'fs';
 import * as cheerio from 'cheerio';
-import ffmetadata from 'ffmetadata';
+import ffmpegPath from 'ffmpeg-static';
+import ffmpeg from 'fluent-ffmpeg';
 import { config } from '../utils/config.util.js';
 import { VodDto, Vod, VodState } from '../models/vod.model.js';
 import { logger } from '../utils/logger.util.js';
+import path from 'path';
+
+ffmpeg.setFfmpegPath(ffmpegPath);
+
+async function writeMp4Title(filePath: string, title: string): Promise<void> {
+    const dir = path.dirname(filePath);
+    const tempFilePath = path.join(dir, `temp_${path.basename(filePath)}`);
+
+    logger.debug(`Writing MP4 title metadata to ${filePath} with title "${title}"`);
+    await new Promise((resolve, reject) => {
+        ffmpeg(filePath)
+            .outputOptions('-metadata', `title=${title}`, '-codec', 'copy')
+            .on('end', () => {
+                logger.debug(`MP4 title metadata written successfully to ${filePath}`);
+                resolve(null);
+            })
+            .on('error', (err) => {
+                logger.error(`Error writing MP4 title metadata: ${err.message}`);
+                reject(err);
+            })
+            .save(tempFilePath);
+    });
+
+    await fs.rename(tempFilePath, filePath, (err) => {
+        if (err) {
+            logger.error(`Error renaming temp file: ${err.message}`);
+            throw err;
+        }
+    });
+}
 
 class PMWService {
     private static url: string = 'https://archive.wubby.tv/vods/public/';
@@ -117,27 +148,18 @@ class PMWService {
         const response = await axios.get(target.url, { responseType: 'stream' });
         response.data.pipe(writer);
 
-        return new Promise((resolve, reject) => {
-            writer.on('finish', () => {
-                target.videoFileLocation = filePath;
-                target.state = VodState.Downloaded;
-
-                // Set MP4 title metadata using ffmetadata
-                ffmetadata.write(filePath, { title: target.title }, (err) => {
-                    target.videoFileLocation = filePath;
-                    target.state = VodState.Downloaded;
-                    if (err) {
-                        logger.error('Error writing metadata:', err);
-                    }
-                    resolve(target);
-                });
-            });
-            writer.on('error', () => {
-                target.videoFileLocation = undefined;
-                target.state = VodState.Error;
-                reject(target);
-            });
+        await new Promise<void>((resolve, reject) => {
+            writer.on('finish', resolve);
+            writer.on('error', reject);
         });
+
+        target.videoFileLocation = filePath;
+        target.state = VodState.Downloaded;
+
+        // Set MP4 title metadata using ffmpeg
+        await writeMp4Title(filePath, target.title);
+
+        return target;
     }
 }
 
