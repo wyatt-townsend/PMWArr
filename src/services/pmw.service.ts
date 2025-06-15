@@ -29,7 +29,7 @@ async function writeMp4Title(filePath: string, title: string): Promise<void> {
             .save(tempFilePath);
     });
 
-    await fs.rename(tempFilePath, filePath, (err) => {
+    fs.rename(tempFilePath, filePath, (err) => {
         if (err) {
             logger.error(`Error renaming temp file: ${err.message}`);
             throw err;
@@ -41,7 +41,7 @@ class PMWService {
     private static url: string = 'https://archive.wubby.tv/vods/public/';
 
     static isSameDay(a: Date, b: Date): boolean {
-        return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+        return a.getUTCFullYear() === b.getUTCFullYear() && a.getUTCMonth() === b.getUTCMonth() && a.getUTCDate() === b.getUTCDate();
     }
 
     static getUrlByDate(date: Date): string {
@@ -106,10 +106,15 @@ class PMWService {
             if (titleParts.length < 2) return; // Skip if title does not have enough parts
             const title = titleParts[1].trim();
             const part = parts;
-            const aired = new Date(target.getFullYear(), target.getMonth(), parseInt(titleParts[0].trim()));
+            const aired = new Date(Date.UTC(target.getFullYear(), target.getMonth(), parseInt(titleParts[0].trim())));
             const link = linkTd.find('a').attr('href') || '';
             const size = this.parseFileSize(sizeTd.text().trim());
-            const published = new Date(dateTd.text().trim());
+
+            // Need to convert the date to UTC
+            const temp = new Date(dateTd.text().trim());
+            const published = new Date(
+                Date.UTC(temp.getFullYear(), temp.getMonth(), temp.getDate(), temp.getHours(), temp.getMinutes(), temp.getSeconds()),
+            );
 
             if (!this.isSameDay(published, target)) return; // Skip if date does not match target
 
@@ -148,16 +153,21 @@ class PMWService {
         const response = await axios.get(target.url, { responseType: 'stream' });
         response.data.pipe(writer);
 
-        await new Promise<void>((resolve, reject) => {
-            writer.on('finish', resolve);
-            writer.on('error', reject);
-        });
+        try {
+            await new Promise<void>((resolve, reject) => {
+                writer.on('finish', resolve);
+                writer.on('error', reject);
+            });
 
-        target.videoFileLocation = filePath;
-        target.state = VodState.Downloaded;
+            target.videoFileLocation = filePath;
+            target.state = VodState.Downloaded;
 
-        // Set MP4 title metadata using ffmpeg
-        await writeMp4Title(filePath, target.title);
+            // Set MP4 title metadata using ffmpeg
+            await writeMp4Title(filePath, target.title);
+        } catch {
+            target.videoFileLocation = undefined;
+            target.state = VodState.Error;
+        }
 
         return target;
     }

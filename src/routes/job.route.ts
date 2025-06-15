@@ -1,10 +1,9 @@
 import express from 'express';
-import syncController from '../controllers/sync.controller.js';
-import downloadController from '../controllers/download.controller.js';
+import jobController from '../controllers/job.controller.js';
 
 const router = express.Router();
 
-router.post('/sync/', syncController.startSyncJob);
-router.post('/download/:id', downloadController.enqueueDownload);
+router.post('/sync/', jobController.startSyncJob);
+router.post('/download/:id', jobController.enqueueDownload);
 
 export default router;
