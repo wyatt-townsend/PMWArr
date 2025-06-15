@@ -1,3 +1,4 @@
+import * as fs from 'fs';
 import VodRepo from '../repo/vod.repo.js';
 import { AppError } from '../utils/error.utils.js';
 import { HttpStatusCode, ErrorCode } from '../utils/codes.util.js';
@@ -21,7 +22,7 @@ class VodService {
     async findVodById(id: number): Promise<Vod> {
         try {
             return await this.vodRepo.findById(id);
-        } catch (err: unknown) {
+        } catch (err) {
             if (err instanceof Error && err.message.includes('not found')) {
                 throw new AppError(`Vod with ID ${id} not found`, HttpStatusCode.NOT_FOUND, ErrorCode.VOD_NOT_FOUND);
             }
@@ -32,7 +33,7 @@ class VodService {
     async createVod(vodDto: VodDto): Promise<Vod> {
         try {
             return await this.vodRepo.create(vodDto);
-        } catch (err: unknown) {
+        } catch (err) {
             if (err instanceof Error && err.message.includes('UNIQUE constraint')) {
                 throw new AppError('Vod already exists', HttpStatusCode.CONFLICT, ErrorCode.VOD_ALREADY_EXISTS);
             }
@@ -43,7 +44,7 @@ class VodService {
     async updateVod(vod: Vod): Promise<Vod> {
         try {
             return await this.vodRepo.update(vod);
-        } catch (err: unknown) {
+        } catch (err) {
             if (err instanceof Error && err.message.includes('not found')) {
                 throw new AppError(`Vod with ID ${vod.id} not found`, HttpStatusCode.NOT_FOUND, ErrorCode.VOD_NOT_FOUND);
             }
@@ -53,13 +54,20 @@ class VodService {
 
     async deleteVod(id: number): Promise<boolean> {
         try {
-            // TODO: Need to delete the video file from disk if it exists
-            return await this.vodRepo.delete(id);
-        } catch (err: unknown) {
-            if (err instanceof Error && err.message.includes('not found')) {
-                throw new AppError(`Vod with ID ${id} not found`, HttpStatusCode.NOT_FOUND, ErrorCode.VOD_NOT_FOUND);
+            const vod = await this.findVodById(id);
+
+            if (vod.videoFileLocation) {
+                // If the vod is downloaded, delete the video file
+                fs.unlinkSync(vod.videoFileLocation);
             }
-            throw new AppError(`Failed to delete vod with ID ${id}`, HttpStatusCode.INTERNAL_SERVER_ERROR, ErrorCode.INTERNAL_SERVER_ERROR);
+
+            return await this.vodRepo.delete(id);
+        } catch (err) {
+            if (err instanceof AppError) {
+                throw err;
+            } else {
+                throw new AppError(`Failed to delete vod with ID ${id}`, HttpStatusCode.INTERNAL_SERVER_ERROR, ErrorCode.INTERNAL_SERVER_ERROR);
+            }
         }
     }
 }

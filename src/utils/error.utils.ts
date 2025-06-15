@@ -6,6 +6,7 @@ export class AppError extends Error {
 
     constructor(message: string = 'Something went wrong', statusCode = HttpStatusCode.INTERNAL_SERVER_ERROR, code = ErrorCode.INTERNAL_SERVER_ERROR) {
         super(message);
+        this.name = 'AppError';
         this.statusCode = statusCode;
         this.code = code;
 
