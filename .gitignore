@@ -139,3 +139,4 @@ dist
 *.sqlite3
 *.txt
 media
+config

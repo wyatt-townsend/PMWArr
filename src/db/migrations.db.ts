@@ -1,50 +1,54 @@
 import { getDatabaseConnection } from './connection.db.js';
 import { logger } from '../utils/logger.util.js';
 
-/**
- * Run database migrations to ensure the database schema is up to date.
- */
+function execAsync(db, sql: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+        db.exec(sql, (err) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve();
+            }
+        });
+    });
+}
+
 export async function runMigrations(): Promise<void> {
     const db = await getDatabaseConnection();
 
-    // Create the vods table if it doesn't exist
-    db.exec(
-        `
-    CREATE TABLE IF NOT EXISTS vods (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        title TEXT NOT NULL,
-        part INTEGER CHECK (part >= 0),
-        url TEXT UNIQUE NOT NULL,
-        aired DATETIME NOT NULL,
-        published DATETIME NOT NULL,
-        fileSize INTEGER NOT NULL,
-        videoFileLocation TEXT,
-        state INTEGER NOT NULL,
-        updatedAt DATETIME NOT NULL
-    );
-    `,
-        (err) => {
-            if (err) {
-                logger.error('Error creating vods table: ' + err.message);
-            }
-        },
-    );
+    try {
+        await execAsync(
+            db,
+            `
+            CREATE TABLE IF NOT EXISTS vods (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                title TEXT NOT NULL,
+                part INTEGER CHECK (part >= 0),
+                url TEXT UNIQUE NOT NULL,
+                aired DATETIME NOT NULL,
+                published DATETIME NOT NULL,
+                fileSize INTEGER NOT NULL,
+                videoFileLocation TEXT,
+                state INTEGER NOT NULL,
+                updatedAt DATETIME NOT NULL
+            );
+        `,
+        );
 
-    // Create the settings table if it doesn't exist
-    db.exec(
-        `
-    CREATE TABLE IF NOT EXISTS settings (
-        id INTEGER PRIMARY KEY CHECK (id = 1),
-        auto_download BOOLEAN NOT NULL,
-        sync_schedule TEXT NOT NULL
-    );
-    `,
-        (err) => {
-            if (err) {
-                logger.error('Error creating vods table: ' + err.message);
-            }
-        },
-    );
-
-    db.close();
+        await execAsync(
+            db,
+            `
+            CREATE TABLE IF NOT EXISTS settings (
+                id INTEGER PRIMARY KEY CHECK (id = 1),
+                auto_download BOOLEAN NOT NULL,
+                sync_schedule TEXT NOT NULL
+            );
+        `,
+        );
+    } catch (err) {
+        logger.error('Migration error: ' + err.message);
+        throw err;
+    } finally {
+        db.close();
+    }
 }

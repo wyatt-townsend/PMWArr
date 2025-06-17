@@ -10,7 +10,7 @@ fs.mkdirSync(config.CONFIG_DIR, { recursive: true });
  * Function to get a sqlite3 database connection
  */
 export function getDatabaseConnection(): sqlite3.Database {
-    return new sqlite3.Database(config.CONFIG_DIR + 'database.sqlite3', (err) => {
+    return new sqlite3.Database(config.CONFIG_DIR + '/database.sqlite3', (err) => {
         if (err) {
             logger.error(err.message);
         }
