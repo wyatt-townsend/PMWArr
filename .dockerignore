@@ -1,0 +1,41 @@
+# dependencies
+node_modules
+npm-debug.log
+yarn-error.log
+pnpm-debug.log
+
+# TypeScript
+*.tsbuildinfo
+
+# Logs
+logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Testing
+coverage
+*.lcov
+
+# Build output
+dist
+build
+frontend/dist
+
+# Env files (optional, if you inject them at runtime)
+.env
+.env.*
+
+# Editor
+.vscode
+.idea
+
+# Misc
+.git
+.gitignore
+
+# local directories
+config
+media

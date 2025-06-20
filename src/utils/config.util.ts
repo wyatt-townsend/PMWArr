@@ -9,8 +9,8 @@ dotenv.config({ path: path.resolve(process.cwd(), '.env') });
 const ConfigSchema = z.object({
     PORT: z.coerce.number().default(3000),
     LOG_LEVEL: z.string().optional().default('info'),
-    CONFIG_DIR: z.string().optional().default(path.resolve(process.cwd(), 'config')),
-    MEDIA_DIR: z.string().optional().default(path.resolve(process.cwd(), 'media')),
+    CONFIG_DIR: z.string().optional().default(path.resolve(process.cwd(), '.config')),
+    MEDIA_DIR: z.string().optional().default(path.resolve(process.cwd(), '.media')),
 });
 
 // Validate and parse config
