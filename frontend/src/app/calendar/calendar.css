@@ -1,0 +1,74 @@
+.calendar-container {
+    margin: 2rem auto;
+    background: var(--color-background-elevated);
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    padding: 1.5rem;
+}
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+.calendar-header .nav-button {
+    background: var(--color-background-accent);
+    border: none;
+    border-radius: 50%;
+    width: 2rem;
+    height: 2rem;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.calendar-header .nav-button:hover {
+    background: #e0e0e0;
+}
+.calendar-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+.calendar-row {
+    display: flex;
+}
+.calendar-day-label {
+    flex: 1;
+    text-align: center;
+    font-weight: 600;
+    color: var(--color-text-main);
+    padding: 0.3rem 0;
+}
+.calendar-cell {
+    flex: 1;
+    height: 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border-radius: 6px;
+    position: relative;
+    transition: background 0.2s;
+}
+.calendar-cell.selected {
+    background: var(--color-background-accent);
+    color: var(--color-text-inverse);
+}
+.calendar-cell:hover:not(.selected) {
+    background: var(--color-background-surface);
+}
+.today-button {
+    background: var(--color-background-surface);
+    color: var(--color-text-main);
+    border: none;
+    border-radius: 10%;
+    margin-top: 1rem;
+    padding: 0.5rem 0.75rem;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: background 0.2s;
+    margin-right: 2rem;
+}
+.today-button:hover {
+    background: var(--color-background-main);
+}

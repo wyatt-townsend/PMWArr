@@ -1,0 +1,4 @@
+header {
+    background: var(--color-background-header);
+    color: var(--color-text-main);
+}

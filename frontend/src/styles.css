@@ -1,1 +1,143 @@
-/* You can add global styles to this file, and also import other style files */
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@100;200;300;400;500;600;700&display=swap');
+
+@layer reset {
+    *,
+    *::before,
+    *::after {
+        box-sizing: border-box;
+    }
+
+    * {
+        padding: 0;
+        margin: 0;
+    }
+
+    body {
+        min-block-size: 100vh;
+        line-height: 1.6;
+    }
+
+    h1,
+    h2,
+    h3,
+    button,
+    input,
+    label {
+        line-height: 1.1; /* Large line breaks look bad */
+    }
+
+    h1,
+    h2,
+    h3,
+    h4 {
+        text-wrap: balance; /* Makes text wrapping better for large text */
+    }
+
+    img,
+    picture {
+        max-inline-size: 100%;
+        display: block;
+    }
+
+    input,
+    button,
+    textarea,
+    select {
+        font: inherit !important; /* These don't automatically inherit font family */
+    }
+}
+
+@layer base {
+    :root {
+        /* Primitives */
+
+        /* Colors - Dark Theme */
+        --clr-grey-1000: hsl(220, 13%, 10%); /* Background darkest */
+        --clr-grey-900: hsl(220, 13%, 15%); /* Card/Surface */
+        --clr-grey-800: hsl(220, 13%, 20%); /* Elevated Surface */
+        --clr-grey-700: hsl(220, 13%, 25%); /* Borders/Inputs */
+        --clr-grey-600: hsl(220, 13%, 35%); /* Muted text */
+        --clr-grey-500: hsl(220, 13%, 45%); /* Main text */
+        --clr-grey-400: hsl(220, 13%, 60%); /* Secondary text */
+        --clr-grey-300: hsl(220, 13%, 75%); /* Disabled text */
+        --clr-grey-200: hsl(220, 13%, 85%); /* Lightest text */
+        --clr-accent-500: hsl(200, 100%, 60%); /* Accent blue */
+        --clr-accent-400: hsl(200, 100%, 70%); /* Accent blue lighter */
+        --clr-error: hsl(0, 80%, 60%);
+        --clr-success: hsl(140, 60%, 40%);
+        --clr-warning: hsl(40, 100%, 60%);
+        --clr-white: hsl(0, 0%, 100%);
+
+        /* Font */
+        --ff-base: 'IBM Plex Sans', 'sans-serif';
+
+        --fs-300: 0.875rem;
+        --fs-400: 1rem;
+        --fs-500: 1.25rem;
+        --fs-600: 1.5rem;
+        --fs-700: 2rem;
+        --fs-800: 3rem;
+        --fs-900: 5rem;
+        --fs-1000: 7.5rem;
+
+        /* Semantic Properties */
+        --color-brand-primary: var(--clr-accent-500);
+        --color-brand-secondary: var(--clr-accent-400);
+        --color-error: var(--clr-error);
+        --color-success: var(--clr-success);
+        --color-warning: var(--clr-warning);
+
+        --color-text-main: var(--clr-grey-200);
+        --color-text-secondary: var(--clr-grey-400);
+        --color-text-muted: var(--clr-grey-600);
+        --color-text-inverse: var(--clr-grey-1000);
+
+        --color-background-main: var(--clr-grey-1000);
+        --color-background-surface: var(--clr-grey-900);
+        --color-background-elevated: var(--clr-grey-800);
+        --color-background-header: var(--clr-grey-900);
+        --color-background-footer: var(--clr-grey-900);
+        --color-background-accent: var(--clr-accent-500);
+
+        --color-border: var(--clr-grey-700);
+        --color-border-light: var(--clr-grey-600);
+        --color-border-accent: var(--clr-accent-500);
+
+        /* Font Sizes */
+        --font-size-heading-sm: var(--fs-700);
+        --font-size-heading-md: var(--fs-800);
+        --font-size-heading-lg: var(--fs-900);
+        --font-size-heading-xl: var(--fs-1000);
+        --font-size-sm: var(--fs-300);
+        --font-size-md: var(--fs-400);
+        --font-size-lg: var(--fs-500);
+        --font-size-xl: var(--fs-600);
+    }
+
+    :root {
+        /* Media Query Changes*/
+        @media (width < 760px) {
+            --fs-300: 0.875rem;
+            --fs-400: 1rem;
+            --fs-500: 1.125rem;
+            --fs-600: 1.25rem;
+            --fs-700: 1.5rem;
+            --fs-800: 2rem;
+            --fs-900: 3.75rem;
+            --fs-1000: 3.75rem;
+        }
+    }
+
+    body {
+        font-family: var(--ff-base);
+        background: var(--color-background-main);
+        color: var(--color-text-main);
+        font-size: var(--font-size-md);
+    }
+
+    .container {
+        max-width: 75rem;
+        margin: 0 auto;
+        padding: 1rem;
+    }
+}
