@@ -16,7 +16,10 @@
                     [class.selected]="day && selectedDate && day.toDateString() === selectedDate.toDateString()"
                     (click)="selectDate(day)"
                 >
-                    <span *ngIf="day">{{ day.getDate() }}</span>
+                    <span *ngIf="day" class="calendar-cell-content">
+                    {{ day.getDate() }}
+                    <span *ngIf="hasVodOnDate(day)" class="vod-marker"></span>
+                    </span>
                 </div>
             </div>
         </div>

@@ -1,0 +1,10 @@
+<div class="card">
+    <p>{{info().title}}</p>
+    <span [ngClass]="{
+    'status-discovered': info().status === 'Discovered',
+    'status-downloaded': info().status === 'Downloaded',
+    'status-downloading': info().status === 'Downloading',
+    'status-error': info().status === 'Error',
+    }">
+    {{info().status}}</span>
+</div>

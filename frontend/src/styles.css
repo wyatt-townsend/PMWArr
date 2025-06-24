@@ -63,6 +63,7 @@
         --clr-grey-200: hsl(220, 13%, 85%); /* Lightest text */
         --clr-accent-500: hsl(200, 100%, 60%); /* Accent blue */
         --clr-accent-400: hsl(200, 100%, 70%); /* Accent blue lighter */
+        --clr-purple-500: hsl(265, 80%, 65%); /* Purple */
         --clr-error: hsl(0, 80%, 60%);
         --clr-success: hsl(140, 60%, 40%);
         --clr-warning: hsl(40, 100%, 60%);
@@ -83,6 +84,7 @@
         /* Semantic Properties */
         --color-brand-primary: var(--clr-accent-500);
         --color-brand-secondary: var(--clr-accent-400);
+        --color-brand-purple: var(--clr-purple-500);
         --color-error: var(--clr-error);
         --color-success: var(--clr-success);
         --color-warning: var(--clr-warning);

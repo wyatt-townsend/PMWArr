@@ -1,0 +1,11 @@
+<div class="container">
+    <ul>
+        @for (info of filteredVodInfo; track info.id) {
+            <li>
+                <app-vod-item
+                    [info]="info"
+                ></app-vod-item>
+            </li>
+        }
+    </ul>
+</div>

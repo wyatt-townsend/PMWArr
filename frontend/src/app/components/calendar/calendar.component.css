@@ -57,6 +57,13 @@
 .calendar-cell:hover:not(.selected) {
     background: var(--color-background-surface);
 }
+.calendar-cell-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
 .today-button {
     background: var(--color-background-surface);
     color: var(--color-text-main);
@@ -71,4 +78,13 @@
 }
 .today-button:hover {
     background: var(--color-background-main);
+}
+.vod-marker {
+  display: block;
+  width: 8px;
+  height: 8px;
+  background: var(--color-background-accent);
+  border-radius: 50%;
+  margin: 2px auto 0 auto;
+  box-shadow: 0 0 2px rgba(0,0,0,0.15);
 }

@@ -1,7 +1,8 @@
 <div class="main-layout">
     <app-header></app-header>
     <main>
-        <app-calendar></app-calendar>
+        <app-calendar (dateEmitted)="onDateSelected($event)"></app-calendar>
+        <app-vod-list [selectedDate]="selectedDate"></app-vod-list>
     </main>
     <app-footer></app-footer>
 </div>
