@@ -22,7 +22,7 @@ const startServer = async () => {
     // Initialize the jobs
     const settings = await settingsService.getSettings();
     schedulerService.scheduleDownloadJob('*/10 * * * * *'); // Every 10 seconds
-    schedulerService.scheduleSyncJob(settings.sync_schedule);
+    schedulerService.scheduleSyncJob(schedulerService.getCronString(settings.sync_day, settings.sync_hour));
 
     // Resolve __dirname equivalent
     const __filename = fileURLToPath(import.meta.url);

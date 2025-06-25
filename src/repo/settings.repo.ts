@@ -13,7 +13,8 @@ class SettingsRepo {
     private parseSettings(row: Settings): Settings {
         return {
             auto_download: Boolean(row.auto_download),
-            sync_schedule: row.sync_schedule,
+            sync_day: Number(row.sync_day),
+            sync_hour: Number(row.sync_hour),
         };
     }
 
@@ -36,15 +37,16 @@ class SettingsRepo {
 
     async set(settings: Settings): Promise<Settings> {
         const query = `
-        INSERT INTO settings (id, auto_download, sync_schedule)
-        VALUES (?, ?, ?)
+        INSERT INTO settings (id, auto_download, sync_day, sync_hour)
+        VALUES (?, ?, ?, ?)
         ON CONFLICT(id) DO UPDATE SET
             auto_download = excluded.auto_download,
-            sync_schedule = excluded.sync_schedule
-    `;
+            sync_day = excluded.sync_day,
+            sync_hour = excluded.sync_hour
+        `;
 
         return new Promise((resolve, reject) => {
-            this.db.run(query, [1, settings.auto_download, settings.sync_schedule], function (err) {
+            this.db.run(query, [1, settings.auto_download, settings.sync_day, settings.sync_hour], function (err) {
                 if (err) {
                     logger.error(err.message);
                     reject(err);

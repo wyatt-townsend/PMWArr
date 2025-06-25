@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import cron from 'node-cron';
 import { Request, Response, NextFunction } from 'express';
 import { AppError } from '../utils/error.utils.js';
 import { HttpStatusCode, ErrorCode } from '../utils/codes.util.js';
@@ -9,7 +8,8 @@ import settingsService from '../services/settings.service.js';
 const settingsSchema = z
     .object({
         auto_download: z.boolean(),
-        sync_schedule: z.string(),
+        sync_day: z.coerce.number().int().min(-1).max(6), // -1 for daily, 0-6 for specific days
+        sync_hour: z.coerce.number().int().min(0).max(23), // 0-23 for hours
     })
     .strict();
 
@@ -36,13 +36,10 @@ const updateSettings = async (req: Request, res: Response, next: NextFunction): 
             );
         }
 
-        if (!cron.validate(result.data.sync_schedule)) {
-            return next(new AppError(`Invalid cron schedule: ${result.data.sync_schedule}`, HttpStatusCode.BAD_REQUEST, ErrorCode.VALIDATION_ERROR));
-        }
-
         const newSettings: Settings = {
             auto_download: result.data.auto_download,
-            sync_schedule: result.data.sync_schedule,
+            sync_day: result.data.sync_day,
+            sync_hour: result.data.sync_hour,
         };
 
         const settings = await settingsService.updateSettings(newSettings);

@@ -65,9 +65,20 @@ class SchedulerService {
         this.downloadJob.start();
     }
 
+    getCronString(sync_day: number, sync_hour: number): string {
+        // node-cron uses 0 = Sunday, 6 = Saturday for day of week
+        if (sync_day === -1) {
+            // Every day at sync_hour
+            return `0 ${sync_hour} * * *`;
+        } else {
+            // Only on specific day at sync_hour
+            return `0 ${sync_hour} * * ${sync_day}`;
+        }
+    }
+
     rescheduleJobs(settings: Settings) {
         // Stop and restart jobs with new settings
-        this.scheduleSyncJob(settings.sync_schedule);
+        this.scheduleSyncJob(this.getCronString(settings.sync_day, settings.sync_hour));
     }
 }
 

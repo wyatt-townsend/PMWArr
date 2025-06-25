@@ -41,7 +41,8 @@ export async function runMigrations(): Promise<void> {
             CREATE TABLE IF NOT EXISTS settings (
                 id INTEGER PRIMARY KEY CHECK (id = 1),
                 auto_download BOOLEAN NOT NULL,
-                sync_schedule TEXT NOT NULL
+                sync_day INTEGER NOT NULL CHECK (sync_day >= -1 AND sync_day <= 6),
+                sync_hour INTEGER NOT NULL CHECK (sync_hour >= 0 AND sync_hour <= 23)
             );
         `,
         );
