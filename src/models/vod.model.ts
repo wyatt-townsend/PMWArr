@@ -20,4 +20,5 @@ interface Vod {
 }
 
 type VodDto = Omit<Vod, 'id' | 'videoFileLocation' | 'updatedAt'>;
-export { VodState, Vod, VodDto };
+export { VodState };
+export type { Vod, VodDto };

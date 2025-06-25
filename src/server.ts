@@ -2,7 +2,6 @@ import cors from 'cors';
 import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { config } from './utils/config.util.js';
 import { logger } from './utils/logger.util.js';
 import { errorHandler, notFoundHandler } from './middleware/error.middleware.js';
 import { loggerMiddleware } from './middleware/log.middleware.js';
@@ -47,7 +46,7 @@ const startServer = async () => {
     app.use(errorHandler);
 
     // Run the server
-    app.listen(config.PORT, '0.0.0.0', () => logger.info(`Server is running on port ${config.PORT}`));
+    app.listen(3000, '0.0.0.0', () => logger.info(`Server is running on port ${3000}`));
 };
 
 // Start the server

@@ -1,10 +1,17 @@
-<div class="card">
-    <p>{{info().title}}</p>
-    <span [ngClass]="{
-    'status-discovered': info().status === 'Discovered',
-    'status-downloaded': info().status === 'Downloaded',
-    'status-downloading': info().status === 'Downloading',
-    'status-error': info().status === 'Error',
-    }">
-    {{info().status}}</span>
+<div class="card" (click)="toggleDropdown()">
+    <p>{{ info().title }}</p>
+    <span class="state" [attr.data-state]="info().state"></span>
+</div>
+<div *ngIf="expanded" class="dropdown">
+    <div><strong>Published:</strong> {{ info().published | date: 'medium' }}</div>
+    @if (info().videoFileLocation) {
+        <div><strong>File Path:</strong> {{ info().videoFileLocation }} bytes</div>
+    }
+    <div><strong>File Size:</strong> {{ info().fileSize | number }} bytes</div>
+    <div><strong>State:</strong> {{ info().state }}</div>
+    @if (info().state === VodState.Downloaded) {
+        <button (click)="doDownload()">Re-Download</button>
+    } @else if (info().state !== VodState.Downloading) {
+        <button (click)="doDownload()">Download</button>
+    }
 </div>

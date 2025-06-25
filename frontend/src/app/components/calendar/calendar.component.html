@@ -17,8 +17,8 @@
                     (click)="selectDate(day)"
                 >
                     <span *ngIf="day" class="calendar-cell-content">
-                    {{ day.getDate() }}
-                    <span *ngIf="hasVodOnDate(day)" class="vod-marker"></span>
+                        {{ day.getDate() }}
+                        <span *ngIf="hasVodOnDate(day)" class="vod-marker"></span>
                     </span>
                 </div>
             </div>

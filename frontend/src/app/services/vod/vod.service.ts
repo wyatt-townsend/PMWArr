@@ -1,53 +1,54 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { Temp } from '../../temp.model'; // Adjust the import path as necessary
+import { map } from 'rxjs/operators';
+import { Vod } from '@shared/vod.model';
+import { HttpClient } from '@angular/common/http';
 
 @Injectable({
     providedIn: 'root',
 })
 export class VodService {
     // Store VOD entities in a BehaviorSubject for reactive access
-    private vodsSubject = new BehaviorSubject<Temp[]>([]);
-    private endpoint = '/api/vods'; // Adjust endpoint as needed
+    private vodsSubject = new BehaviorSubject<Vod[]>([]);
+    private vodEndpoint = '/api/vods'; // Adjust endpoint as needed
+    private jobEndpoint = '/api/job'; // Adjust endpoint as needed
 
-    constructor()
-    {
-        this.syncVods(new Date());
+    constructor(private http: HttpClient) {
+        this.syncVods();
     }
 
     // Fetch all VOD entities from the backend and update the subject
-    syncVods(date: Date): void {
-        this.vodsSubject.next([
-        {
-            id: 1,
-            title: 'Example VOD 1',
-            aired: new Date(2025, 5, 18),
-            status: 'Discovered',
-        },
-        {
-            id: 2,
-            title: 'Example VOD 2',
-            aired: new Date(2025, 5, 19),
-            status: 'Downloaded',
-        },
-        {
-            id: 3,
-            title: 'Example VOD 3',
-            aired: new Date(2025, 5, 20),
-            status: 'Downloading',
-        },
-        {
-            id: 4,
-            title: 'Example VOD 4',
-            aired: new Date(2025, 5, 21),
-            status: 'Error',
-        },
-        ]);
+    syncVods(): void {
+        this.http
+            .get<Vod[]>(this.vodEndpoint)
+            .pipe(
+                map((vods) =>
+                    vods.map((vod) => ({
+                        ...vod,
+                        aired: new Date(vod.aired),
+                        published: new Date(vod.published),
+                        updatedAt: new Date(vod.updatedAt),
+                    })),
+                ),
+            )
+            .subscribe({
+                next: (vods) => this.vodsSubject.next(vods),
+                error: () => this.vodsSubject.next([]),
+            });
     }
 
     // Allow other components to get the current VOD entities as observable
-    getVods(): Observable<Temp[]> {
+    getVods(): Observable<Vod[]> {
         return this.vodsSubject.asObservable();
+    }
+
+    download(vod: Vod): void {
+        console.log(`Downloading VOD: ${vod.title} (ID: ${vod.id})`);
+        //this.http.post(this.jobEndpoint + '/download/' + vod.id, null);
+    }
+
+    sync(date: Date): void {
+        console.log(`Syncing VODs from date: ${date}`);
+        //this.http.post(this.jobEndpoint + '/sync/?date=' + date.toDateString(), null);
     }
 }

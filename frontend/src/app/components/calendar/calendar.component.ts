@@ -1,7 +1,7 @@
 import { Component, inject, OnDestroy, OnInit, signal, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { VodService } from '../../services/vod/vod.service';
-import { Temp } from '../../temp.model';
+import { Vod } from '@shared/vod.model';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -16,8 +16,8 @@ export class CalendarComponent implements OnInit, OnDestroy {
 
     currentDate: Date = new Date();
     selectedDate: Date = new Date();
-    
-    vodInfo = signal<Temp[]>([]);
+
+    vodInfo = signal<Vod[]>([]);
     vodService = inject(VodService);
     private vodsSub?: Subscription;
 
@@ -92,8 +92,6 @@ export class CalendarComponent implements OnInit, OnDestroy {
 
     hasVodOnDate(date: Date | null): boolean {
         if (!date) return false;
-        return this.vodInfo().some(vod => 
-            vod.aired.toDateString() === date.toDateString()
-        );
+        return this.vodInfo().some((vod) => vod.aired.toDateString() === date.toDateString());
     }
 }
