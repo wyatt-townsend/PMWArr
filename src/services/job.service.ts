@@ -5,10 +5,17 @@ import { HttpStatusCode, ErrorCode } from '../utils/codes.util.js';
 import VodService from '../services/vod.service.js';
 import PMWService from './pmw.service.js';
 import { Vod, VodState } from '../models/vod.model.js';
+import { NotificationTopic, NotificationType } from '../models/notification.model.js';
+import NotificationService from '../services/notification.service.js';
 
 class JobService {
     static async doSyncJob(target: Date, download: boolean): Promise<Vod[]> {
         logger.debug(`Starting sync job for target date: ${target.toISOString()}`);
+
+        NotificationService.notify(NotificationTopic.SYNC, {
+            type: NotificationType.INFO,
+            message: `Syncing vods: ${target.toISOString().slice(0, 10)}`,
+        });
 
         try {
             const ret = [];
@@ -26,13 +33,24 @@ class JobService {
                     const vod = await vodService.createVod(vodDto);
                     ret.push(vod);
 
-                    logger.trace(`Created VOD with ID: ${vod.id}`);
+                    logger.debug(`Created VOD with ID: ${vod.id}`);
                 } catch (error) {
                     logger.debug(`Failed to create VOD: ${error.message}`);
                 }
             }
+
+            NotificationService.notify(NotificationTopic.SYNC, {
+                type: NotificationType.INFO,
+                message: `Syncing completed: ${ret.length} vods found`,
+            });
+
             return ret;
         } catch (error) {
+            NotificationService.notify(NotificationTopic.SYNC, {
+                type: NotificationType.ERROR,
+                message: `Syncing failed`,
+            });
+
             throw new AppError(`Error during sync job: ${error.message}`, HttpStatusCode.INTERNAL_SERVER_ERROR, ErrorCode.INTERNAL_SERVER_ERROR);
         }
     }
@@ -45,26 +63,37 @@ class JobService {
         try {
             const target = await vodService.findVodById(id);
 
-            if (target.state !== VodState.Queued) {
-                logger.warn(`VOD with ID ${target.id} is not in a queued state, skipping download.`);
-                return;
-            }
-
-            logger.trace(`Found ${target.id} to process for download`);
+            NotificationService.notify(NotificationTopic.DOWNLOAD, {
+                type: NotificationType.INFO,
+                message: `Downloading ${target.title}`,
+            });
 
             target.state = VodState.Downloading;
             await vodService.updateVod(target);
 
             try {
                 const updatedVod = await PMWService.download(target);
-                logger.trace(`Downloaded VOD with ID: ${updatedVod.id}`);
+                logger.debug(`Downloaded VOD with ID: ${updatedVod.id}`);
+
+                NotificationService.notify(NotificationTopic.DOWNLOAD, {
+                    type: NotificationType.INFO,
+                    message: `Finished downloading ${target.title}`,
+                });
                 return vodService.updateVod(updatedVod);
             } catch (error) {
                 logger.error(`Error downloading VOD with ID ${target.id}: ${error.message}`);
+                NotificationService.notify(NotificationTopic.DOWNLOAD, {
+                    type: NotificationType.ERROR,
+                    message: `Failed downloading ${target.title}`,
+                });
                 target.state = VodState.Error;
                 return vodService.updateVod(target);
             }
         } catch (error) {
+            NotificationService.notify(NotificationTopic.DOWNLOAD, {
+                type: NotificationType.ERROR,
+                message: `Failed downloading`,
+            });
             throw new AppError(
                 `Error fetching VOD with ID ${id}: ${error.message}`,
                 HttpStatusCode.INTERNAL_SERVER_ERROR,

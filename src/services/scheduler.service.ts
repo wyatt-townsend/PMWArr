@@ -55,7 +55,8 @@ class SchedulerService {
             logger.trace(`Running download job at ${new Date().toISOString()}`);
 
             let vods = await new VodService().getAllVods();
-            vods = vods.filter((vod) => vod.state === VodState.Queued);
+            // This job only runs one at a time so if one is marked as downloading it was interupted and need to be restarted
+            vods = vods.filter((vod) => vod.state === VodState.Queued || vod.state === VodState.Downloading);
             for (const vod of vods) {
                 await JobService.doDownloadJob(vod.id);
             }

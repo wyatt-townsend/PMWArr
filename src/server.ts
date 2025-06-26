@@ -1,13 +1,18 @@
 import cors from 'cors';
 import express from 'express';
 import path from 'path';
+import { createServer } from 'http';
+import { Server as SocketIOServer } from 'socket.io';
+
 import { fileURLToPath } from 'url';
 import { logger } from './utils/logger.util.js';
 import { errorHandler, notFoundHandler } from './middleware/error.middleware.js';
 import { loggerMiddleware } from './middleware/log.middleware.js';
 import { runMigrations } from './db/migrations.db.js';
+
 import settingsService from './services/settings.service.js';
 import schedulerService from './services/scheduler.service.js';
+import notificationService from './services/notification.service.js';
 
 import vodRoute from './routes/vod.route.js';
 import jobRoute from './routes/job.route.js';
@@ -15,11 +20,20 @@ import settingsRoute from './routes/settings.route.js';
 
 const startServer = async () => {
     const app = express();
+    const httpServer = createServer(app);
+    const io = new SocketIOServer(httpServer, {
+        cors: {
+            origin: '*',
+            methods: ['GET', 'POST'],
+        },
+    });
 
     // Initialize the database and run migrations
     await runMigrations();
 
-    // Initialize the jobs
+    // Initialize the services
+    notificationService.registerSocket(io);
+
     const settings = await settingsService.getSettings();
     schedulerService.scheduleDownloadJob('*/10 * * * * *'); // Every 10 seconds
     schedulerService.scheduleSyncJob(schedulerService.getCronString(settings.sync_day, settings.sync_hour));
@@ -46,7 +60,7 @@ const startServer = async () => {
     app.use(errorHandler);
 
     // Run the server
-    app.listen(3000, '0.0.0.0', () => logger.info(`Server is running on port ${3000}`));
+    httpServer.listen(3000, '0.0.0.0', () => logger.info(`Server is running on port ${3000}`));
 };
 
 // Start the server
