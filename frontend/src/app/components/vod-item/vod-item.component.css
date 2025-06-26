@@ -24,6 +24,9 @@
 .state[data-state='discovered'] {
     background: var(--color-warning);
 }
+.state[data-state='queued'] {
+    background: var(--color-brand-secondary);
+}
 .state[data-state='downloaded'] {
     background: var(--color-success);
 }

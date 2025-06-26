@@ -54,14 +54,16 @@ export class VodService {
     }
 
     sync(date: Date): void {
-        this.http.post<Vod[]>(this.jobEndpoint + '/sync/?date=' + date.toDateString(), null).subscribe({
-            next: (response) => {
-                console.log('Vod sync request successful:', response);
-                this.syncVods(); // Refresh the VOD list after sync
-            },
-            error: (error) => {
-                console.error('Vod sync request failed:', error);
-            },
-        });
+        this.http
+            .post<Vod[]>(this.jobEndpoint + '/sync/?date=' + date.toISOString().slice(0, 10), null) // "2025-06-25"
+            .subscribe({
+                next: (response) => {
+                    console.log('Vod sync request successful:', response);
+                    this.syncVods(); // Refresh the VOD list after sync
+                },
+                error: (error) => {
+                    console.error('Vod sync request failed:', error);
+                },
+            });
     }
 }
