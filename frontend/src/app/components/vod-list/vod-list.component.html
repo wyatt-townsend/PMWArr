@@ -2,7 +2,7 @@
     <ul>
         @for (info of filteredVodInfo; track info.id) {
             <li>
-                <app-vod-item [info]="info"></app-vod-item>
+                <vod-item-component [info]="info"></vod-item-component>
             </li>
         }
     </ul>

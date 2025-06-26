@@ -1,0 +1,5 @@
+<calendar-component (dateEmitted)="onDateSelected($event)"></calendar-component>
+<div class="container">
+    <button (click)="onSync()">Sync</button>
+</div>
+<vod-list-component [selectedDate]="selectedDate"></vod-list-component>

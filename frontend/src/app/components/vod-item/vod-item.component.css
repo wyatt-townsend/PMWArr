@@ -65,6 +65,5 @@
     margin-right: 2rem;
 }
 .dropdown button:hover {
-    background: var(--color-background-main);
-    color: var(--color-text-main);
+    background: var(--color-brand-secondary);
 }

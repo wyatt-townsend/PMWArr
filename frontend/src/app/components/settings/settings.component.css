@@ -1,0 +1,45 @@
+.container {
+    max-width: 40rem;
+    margin: 1.25rem auto;
+    padding: 1.25rem;
+    display: flex;
+    align-items: center;
+}
+
+.form-group {
+    margin-bottom: 2rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+select {
+    width: 10rem;
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+input[type='number'] {
+    width: 5rem;
+    padding: 0.25rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+button[type='submit'] {
+    background-color: var(--color-brand-primary);
+    color: var(--color-text-inverse);
+    border: none;
+    padding: 0.75rem 1.25rem;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+button[type='submit']:hover {
+    background: var(--color-brand-secondary);
+}

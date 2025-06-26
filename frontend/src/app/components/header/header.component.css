@@ -2,3 +2,18 @@ header {
     background: var(--color-background-header);
     color: var(--color-text-main);
 }
+
+header a {
+    color: var(--color-text-main);
+    text-decoration: none;
+}
+header a:hover {
+    color: var(--color-text-muted);
+}
+
+.header-content {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}

@@ -15,7 +15,7 @@ export class SettingsService {
         return this.http.get<Settings>(this.settingsEndpoint);
     }
 
-    updateSettings(settings: Settings): void {
-        this.http.post<Settings>(this.settingsEndpoint, settings);
+    updateSettings(settings: Settings): Observable<Settings> {
+        return this.http.post<Settings>(this.settingsEndpoint, settings);
     }
 }

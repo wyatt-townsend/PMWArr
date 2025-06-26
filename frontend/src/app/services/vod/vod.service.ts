@@ -43,12 +43,25 @@ export class VodService {
     }
 
     download(vod: Vod): void {
-        console.log(`Downloading VOD: ${vod.title} (ID: ${vod.id})`);
-        //this.http.post(this.jobEndpoint + '/download/' + vod.id, null);
+        this.http.post<void>(this.jobEndpoint + '/download/' + vod.id, null).subscribe({
+            next: (response) => {
+                console.log('Vod download request successful:', response);
+            },
+            error: (error) => {
+                console.error('Vod download request failed:', error);
+            },
+        });
     }
 
     sync(date: Date): void {
-        console.log(`Syncing VODs from date: ${date}`);
-        //this.http.post(this.jobEndpoint + '/sync/?date=' + date.toDateString(), null);
+        this.http.post<Vod[]>(this.jobEndpoint + '/sync/?date=' + date.toDateString(), null).subscribe({
+            next: (response) => {
+                console.log('Vod sync request successful:', response);
+                this.syncVods(); // Refresh the VOD list after sync
+            },
+            error: (error) => {
+                console.error('Vod sync request failed:', error);
+            },
+        });
     }
 }

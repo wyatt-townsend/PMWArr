@@ -4,7 +4,7 @@ import { VodService } from 'app/services/vod/vod.service';
 import { CommonModule } from '@angular/common';
 
 @Component({
-    selector: 'app-vod-item',
+    selector: 'vod-item-component',
     imports: [CommonModule],
     templateUrl: './vod-item.component.html',
     styleUrl: './vod-item.component.css',

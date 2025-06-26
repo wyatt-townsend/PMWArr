@@ -5,7 +5,7 @@ import { Vod } from '@shared/vod.model';
 import { Subscription } from 'rxjs';
 
 @Component({
-    selector: 'app-calendar',
+    selector: 'calendar-component',
     standalone: true,
     imports: [CommonModule],
     templateUrl: './calendar.component.html',

@@ -5,7 +5,7 @@ import { Vod } from '@shared/vod.model';
 import { Subscription } from 'rxjs';
 
 @Component({
-    selector: 'app-vod-list',
+    selector: 'vod-list-component',
     imports: [VodItemComponent],
     templateUrl: './vod-list.component.html',
     styleUrl: './vod-list.component.css',
