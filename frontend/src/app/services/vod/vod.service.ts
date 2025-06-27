@@ -1,24 +1,48 @@
-import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { Injectable, inject, OnInit, OnDestroy } from '@angular/core';
+import { BehaviorSubject, Observable, Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Vod } from '@shared/vod.model';
 import { HttpClient } from '@angular/common/http';
+import { NotificationService } from '../notification/notification.service';
+import { NotificationType } from '@shared/notification.model';
 
 @Injectable({
     providedIn: 'root',
 })
-export class VodService {
+export class VodService implements OnInit, OnDestroy {
     // Store VOD entities in a BehaviorSubject for reactive access
     private vodsSubject = new BehaviorSubject<Vod[]>([]);
     private vodEndpoint = '/api/vods'; // Adjust endpoint as needed
     private jobEndpoint = '/api/job'; // Adjust endpoint as needed
 
+    // Notifications
+    notificationService = inject(NotificationService);
+    notificationSubscription: Subscription;
+
     constructor(private http: HttpClient) {
-        this.syncVods();
+        this.fetchVods();
+    }
+
+    ngOnInit(): void {
+        // Subscribe to sync notifications
+        this.notificationSubscription = this.notificationService.getNotificationObservable().subscribe({
+            next: (notification) => {
+                if (notification.message.type !== NotificationType.ERROR) {
+                    this.fetchVods();
+                    console.log('VODs updated after notification:', notification.message);
+                }
+            },
+        });
+    }
+
+    ngOnDestroy(): void {
+        if (this.notificationSubscription) {
+            this.notificationSubscription.unsubscribe();
+        }
     }
 
     // Fetch all VOD entities from the backend and update the subject
-    syncVods(): void {
+    fetchVods(): void {
         this.http
             .get<Vod[]>(this.vodEndpoint)
             .pipe(
@@ -59,7 +83,6 @@ export class VodService {
             .subscribe({
                 next: (response) => {
                     console.log('Vod sync request successful:', response);
-                    this.syncVods(); // Refresh the VOD list after sync
                 },
                 error: (error) => {
                     console.error('Vod sync request failed:', error);

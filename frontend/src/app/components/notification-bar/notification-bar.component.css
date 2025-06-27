@@ -1,0 +1,32 @@
+.notification {
+    position: fixed;
+    top: 4rem;
+    left: 0;
+    width: 100%;
+    padding: 0 1rem;
+    z-index: 1000;
+    background: var(--color-brand-secondary);
+    color: var(--color-text-inverse);
+    display: flex;
+    justify-content: center;
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.notification-text {
+    max-width: min(90vw, 1200px);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: center;
+}
