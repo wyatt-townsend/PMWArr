@@ -12,11 +12,6 @@ class JobService {
     static async doSyncJob(target: Date, download: boolean): Promise<Vod[]> {
         logger.debug(`Starting sync job for target date: ${target.toISOString()}`);
 
-        NotificationService.notify(NotificationTopic.SYNC, {
-            type: NotificationType.INFO,
-            message: `Syncing vods: ${target.toISOString().slice(0, 10)}`,
-        });
-
         try {
             const ret = [];
             const vods = await PMWService.sync(target);
@@ -39,18 +34,8 @@ class JobService {
                 }
             }
 
-            NotificationService.notify(NotificationTopic.SYNC, {
-                type: NotificationType.INFO,
-                message: `Syncing completed: ${ret.length} vods found`,
-            });
-
             return ret;
         } catch (error) {
-            NotificationService.notify(NotificationTopic.SYNC, {
-                type: NotificationType.ERROR,
-                message: `Syncing failed`,
-            });
-
             throw new AppError(`Error during sync job: ${error.message}`, HttpStatusCode.INTERNAL_SERVER_ERROR, ErrorCode.INTERNAL_SERVER_ERROR);
         }
     }

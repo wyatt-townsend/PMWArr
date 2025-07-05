@@ -2,9 +2,9 @@ import { Injectable, inject, OnInit, OnDestroy } from '@angular/core';
 import { BehaviorSubject, Observable, Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Vod } from '@shared/vod.model';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { NotificationService } from '../notification/notification.service';
-import { NotificationType } from '@shared/notification.model';
+import { NotificationType, NotificationTopic } from '@shared/notification.model';
 
 @Injectable({
     providedIn: 'root',
@@ -79,13 +79,34 @@ export class VodService implements OnInit, OnDestroy {
 
     sync(date: Date): void {
         this.http
-            .post<Vod[]>(this.jobEndpoint + '/sync/?date=' + date.toISOString().slice(0, 10), null) // "2025-06-25"
+            .post<Vod[]>(this.jobEndpoint + '/sync/', null, {
+                params: new HttpParams({
+                    fromObject: {
+                        date: date.toISOString().slice(0, 10), // Format date as YYYY-MM-DD
+                    },
+                }),
+            }) // "2025-06-25"
             .subscribe({
                 next: (response) => {
                     console.log('Vod sync request successful:', response);
+                    this.notificationService.notify({
+                        topic: NotificationTopic.SYNC,
+                        message: {
+                            type: NotificationType.INFO,
+                            message: `VOD sync completed successfully. ${response.length} VODs found.`,
+                        },
+                    });
+                    this.fetchVods(); // Refresh VODs after sync
                 },
                 error: (error) => {
                     console.error('Vod sync request failed:', error);
+                    this.notificationService.notify({
+                        topic: NotificationTopic.SYNC,
+                        message: {
+                            type: NotificationType.ERROR,
+                            message: `VOD sync failed: ${error.message}`,
+                        },
+                    });
                 },
             });
     }
