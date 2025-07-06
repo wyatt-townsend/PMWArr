@@ -116,7 +116,8 @@ class PMWService {
                 Date.UTC(temp.getFullYear(), temp.getMonth(), temp.getDate(), temp.getHours(), temp.getMinutes(), temp.getSeconds()),
             );
 
-            if (!this.isSameDay(published, target)) return; // Skip if date does not match target
+            if (!this.isSameDay(aired, target)) return; // Skip if date does not match target
+            console.log(`aired = ${aired.toISOString()}, target = ${target.toISOString()}`);
 
             vods.push({
                 title: title,

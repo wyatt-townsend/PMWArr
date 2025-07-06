@@ -92,6 +92,10 @@ export class CalendarComponent implements OnInit, OnDestroy {
 
     hasVodOnDate(date: Date | null): boolean {
         if (!date) return false;
-        return this.vodInfo().some((vod) => vod.aired.toDateString() === date.toDateString());
+
+        return this.vodInfo().some((vod) => {
+            const aired = vod.aired;
+            return aired.getUTCFullYear() === date.getFullYear() && aired.getUTCMonth() === date.getMonth() && aired.getUTCDate() === date.getDate();
+        });
     }
 }

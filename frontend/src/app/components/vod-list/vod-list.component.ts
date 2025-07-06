@@ -28,6 +28,13 @@ export class VodListComponent implements OnInit, OnDestroy {
 
     get filteredVodInfo() {
         if (!this.selectedDate) return [];
-        return this.vodInfo().filter((vod) => vod.aired.toDateString() === this.selectedDate?.toDateString());
+        return this.vodInfo().filter((vod) => {
+            const aired = vod.aired;
+            return (
+                aired.getUTCFullYear() === this.selectedDate.getFullYear() &&
+                aired.getUTCMonth() === this.selectedDate.getMonth() &&
+                aired.getUTCDate() === this.selectedDate.getDate()
+            );
+        });
     }
 }
