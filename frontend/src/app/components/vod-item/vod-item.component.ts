@@ -21,5 +21,6 @@ export class VodItemComponent {
 
     doDownload() {
         this.vodService.download(this.info());
+        this.toggleDropdown();
     }
 }

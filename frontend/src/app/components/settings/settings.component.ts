@@ -1,6 +1,9 @@
 import { Component, inject, signal, OnInit, OnDestroy } from '@angular/core';
 import { FormGroup, FormControl, ReactiveFormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { SettingsService } from 'app/services/settings/settings.service';
+import { NotificationService } from 'app/services/notification/notification.service';
+import { NotificationTopic, NotificationType } from '@shared/notification.model';
 import Settings from '@shared/settings.model';
 import { Subscription } from 'rxjs';
 
@@ -19,7 +22,9 @@ interface ISettingsFormGroup {
 export class SettingsComponent implements OnInit, OnDestroy {
     form: FormGroup<ISettingsFormGroup>;
     settings = signal<Settings>(null);
+    private router = inject(Router);
     private settingsService = inject(SettingsService);
+    private notificationService = inject(NotificationService);
     private settingsSub?: Subscription;
 
     readonly syncDayOptions = [
@@ -69,11 +74,24 @@ export class SettingsComponent implements OnInit, OnDestroy {
             this.settingsService.updateSettings(updatedSettings).subscribe({
                 next: (response) => {
                     console.log('Settings saved successfully:', response);
-                    // Handle success (e.g., show a success message)
+                    this.notificationService.notify({
+                        topic: NotificationTopic.SETTINGS,
+                        message: {
+                            type: NotificationType.SUCCESS,
+                            message: 'Settings updated successfully',
+                        },
+                    });
+                    this.router.navigate(['/']);
                 },
                 error: (error) => {
                     console.error('Error saving settings:', error);
-                    // Handle error (e.g., show an error message)
+                    this.notificationService.notify({
+                        topic: NotificationTopic.SETTINGS,
+                        message: {
+                            type: NotificationType.ERROR,
+                            message: `Failed to update settings: ${error.message}`,
+                        },
+                    });
                 },
             });
         }

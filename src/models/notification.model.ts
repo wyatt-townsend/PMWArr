@@ -1,10 +1,11 @@
 enum NotificationTopic {
     DOWNLOAD = 'download',
     SYNC = 'sync',
+    SETTINGS = 'settings',
 }
 
 enum NotificationType {
-    INFO = 'info',
+    SUCCESS = 'success',
     ERROR = 'error',
 }
 

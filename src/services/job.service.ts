@@ -49,7 +49,7 @@ class JobService {
             const target = await vodService.findVodById(id);
 
             NotificationService.notify(NotificationTopic.DOWNLOAD, {
-                type: NotificationType.INFO,
+                type: NotificationType.SUCCESS,
                 message: `Downloading ${target.title}`,
             });
 
@@ -61,7 +61,7 @@ class JobService {
                 logger.debug(`Downloaded VOD with ID: ${updatedVod.id}`);
 
                 NotificationService.notify(NotificationTopic.DOWNLOAD, {
-                    type: NotificationType.INFO,
+                    type: NotificationType.SUCCESS,
                     message: `Finished downloading ${target.title}`,
                 });
                 return vodService.updateVod(updatedVod);

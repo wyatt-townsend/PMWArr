@@ -64,11 +64,23 @@ export class VodService implements OnDestroy {
 
     download(vod: Vod): void {
         this.http.post<void>(this.jobEndpoint + '/download/' + vod.id, null).subscribe({
-            next: (response) => {
-                console.log('Vod download request successful:', response);
+            next: () => {
+                this.notificationService.notify({
+                    topic: NotificationTopic.SYNC,
+                    message: {
+                        type: NotificationType.SUCCESS,
+                        message: `VOD queued for download.`,
+                    },
+                });
             },
             error: (error) => {
-                console.error('Vod download request failed:', error);
+                this.notificationService.notify({
+                    topic: NotificationTopic.SYNC,
+                    message: {
+                        type: NotificationType.SUCCESS,
+                        message: `Failed to queue VOD for download: ${error.message}`,
+                    },
+                });
             },
         });
     }
@@ -88,7 +100,7 @@ export class VodService implements OnDestroy {
                     this.notificationService.notify({
                         topic: NotificationTopic.SYNC,
                         message: {
-                            type: NotificationType.INFO,
+                            type: NotificationType.SUCCESS,
                             message: `VOD sync completed successfully. ${response.length} VODs found.`,
                         },
                     });
