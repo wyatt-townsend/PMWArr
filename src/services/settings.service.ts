@@ -2,6 +2,9 @@ import Settings from '../models/settings.model.js';
 import SettingsRepo from '../repo/settings.repo.js';
 import schedulerService from './scheduler.service.js';
 
+import { NotificationTopic, NotificationType } from '../models/notification.model.js';
+import NotificationService from '../services/notification.service.js';
+
 class SettingsService {
     private cache: Settings = null;
     private settingsRepo: SettingsRepo;
@@ -31,10 +34,24 @@ class SettingsService {
     }
 
     async updateSettings(newSettings: Settings): Promise<Settings> {
-        this.cache = await this.settingsRepo.set(newSettings);
+        try {
+            this.cache = await this.settingsRepo.set(newSettings);
 
-        // Notify scheduler to update jobs
-        schedulerService.rescheduleJobs(this.cache);
+            // Notify scheduler to update jobs
+            schedulerService.rescheduleJobs(this.cache);
+
+            NotificationService.notify(NotificationTopic.SETTINGS, {
+                type: NotificationType.SUCCESS,
+                message: `Settings updated successfully`,
+            });
+        } catch (err) {
+            NotificationService.notify(NotificationTopic.SETTINGS, {
+                type: NotificationType.ERROR,
+                message: `Settings failed to update`,
+            });
+
+            throw new Error(`Failed to update settings: ${err.message}`);
+        }
 
         return this.cache;
     }

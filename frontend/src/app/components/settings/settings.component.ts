@@ -3,7 +3,6 @@ import { FormGroup, FormControl, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { SettingsService } from 'app/services/settings/settings.service';
 import { NotificationService } from 'app/services/notification/notification.service';
-import { NotificationTopic, NotificationType } from '@shared/notification.model';
 import Settings from '@shared/settings.model';
 import { Subscription } from 'rxjs';
 
@@ -72,26 +71,12 @@ export class SettingsComponent implements OnInit, OnDestroy {
             };
 
             this.settingsService.updateSettings(updatedSettings).subscribe({
-                next: (response) => {
-                    console.log('Settings saved successfully:', response);
-                    this.notificationService.notify({
-                        topic: NotificationTopic.SETTINGS,
-                        message: {
-                            type: NotificationType.SUCCESS,
-                            message: 'Settings updated successfully',
-                        },
-                    });
+                next: () => {
+                    console.log('Settings saved successfully');
                     this.router.navigate(['/']);
                 },
                 error: (error) => {
                     console.error('Error saving settings:', error);
-                    this.notificationService.notify({
-                        topic: NotificationTopic.SETTINGS,
-                        message: {
-                            type: NotificationType.ERROR,
-                            message: `Failed to update settings: ${error.message}`,
-                        },
-                    });
                 },
             });
         }

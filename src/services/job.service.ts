@@ -34,8 +34,18 @@ class JobService {
                 }
             }
 
+            NotificationService.notify(NotificationTopic.SYNC, {
+                type: NotificationType.SUCCESS,
+                message: `Found ${ret.length} new VODs on ${target.toDateString()}`,
+            });
+
             return ret;
         } catch (error) {
+            NotificationService.notify(NotificationTopic.SYNC, {
+                type: NotificationType.ERROR,
+                message: `Failed to sync VODs for ${target.toDateString()}`,
+            });
+
             throw new AppError(`Error during sync job: ${error.message}`, HttpStatusCode.INTERNAL_SERVER_ERROR, ErrorCode.INTERNAL_SERVER_ERROR);
         }
     }

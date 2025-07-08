@@ -6,6 +6,8 @@ import VodService from '../services/vod.service.js';
 import JobService from '../services/job.service.js';
 import settingsService from '../services/settings.service.js';
 import { VodState } from '../models/vod.model.js';
+import { NotificationTopic, NotificationType } from '../models/notification.model.js';
+import NotificationService from '../services/notification.service.js';
 
 const idSchema = z
     .object({
@@ -80,8 +82,18 @@ const enqueueDownload = async (req: Request, res: Response, next: NextFunction):
             await vodService.updateVod(vod);
         }
 
+        NotificationService.notify(NotificationTopic.DOWNLOAD, {
+            type: NotificationType.SUCCESS,
+            message: `Enqueued VOD for download`,
+        });
+
         res.status(HttpStatusCode.ACCEPTED).json(vod);
     } catch (err) {
+        NotificationService.notify(NotificationTopic.DOWNLOAD, {
+            type: NotificationType.ERROR,
+            message: `Failed to enqueue VOD for download`,
+        });
+
         return next(err);
     }
 };

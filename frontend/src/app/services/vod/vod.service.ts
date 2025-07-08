@@ -23,7 +23,10 @@ export class VodService implements OnDestroy {
         this.fetchVods();
         this.notificationSubscription = this.notificationService.getNotificationObservable().subscribe({
             next: (notification) => {
-                if (notification.message.type !== NotificationType.ERROR) {
+                if (
+                    notification.message.type !== NotificationType.ERROR &&
+                    (notification.topic === NotificationTopic.DOWNLOAD || notification.topic === NotificationTopic.SYNC)
+                ) {
                     this.fetchVods();
                     console.log('VODs updated after notification:', notification.message);
                 }
@@ -65,22 +68,10 @@ export class VodService implements OnDestroy {
     download(vod: Vod): void {
         this.http.post<void>(this.jobEndpoint + '/download/' + vod.id, null).subscribe({
             next: () => {
-                this.notificationService.notify({
-                    topic: NotificationTopic.SYNC,
-                    message: {
-                        type: NotificationType.SUCCESS,
-                        message: `VOD queued for download.`,
-                    },
-                });
+                console.log('VOD download request successful');
             },
             error: (error) => {
-                this.notificationService.notify({
-                    topic: NotificationTopic.SYNC,
-                    message: {
-                        type: NotificationType.SUCCESS,
-                        message: `Failed to queue VOD for download: ${error.message}`,
-                    },
-                });
+                console.error('VOD download request failed:', error);
             },
         });
     }
@@ -93,28 +84,14 @@ export class VodService implements OnDestroy {
                         date: date.toISOString().slice(0, 10), // Format date as YYYY-MM-DD
                     },
                 }),
-            }) // "2025-06-25"
+            })
             .subscribe({
                 next: (response) => {
                     console.log('Vod sync request successful:', response);
-                    this.notificationService.notify({
-                        topic: NotificationTopic.SYNC,
-                        message: {
-                            type: NotificationType.SUCCESS,
-                            message: `VOD sync completed successfully. ${response.length} VODs found.`,
-                        },
-                    });
-                    this.fetchVods(); // Refresh VODs after sync
+                    this.fetchVods();
                 },
                 error: (error) => {
                     console.error('Vod sync request failed:', error);
-                    this.notificationService.notify({
-                        topic: NotificationTopic.SYNC,
-                        message: {
-                            type: NotificationType.ERROR,
-                            message: `VOD sync failed: ${error.message}`,
-                        },
-                    });
                 },
             });
     }

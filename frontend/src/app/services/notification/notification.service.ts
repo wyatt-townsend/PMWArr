@@ -48,10 +48,6 @@ export class NotificationService implements OnDestroy {
         });
     }
 
-    public notify(notification: Notification): void {
-        this.notificationSubject.next(notification);
-    }
-
     public getNotificationObservable(): Observable<Notification> {
         return this.notificationSubject.asObservable();
     }
