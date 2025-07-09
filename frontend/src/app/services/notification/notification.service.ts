@@ -16,7 +16,7 @@ export class NotificationService implements OnDestroy {
     private notificationSubject = new Subject<Notification>();
 
     constructor() {
-        this.socket = io('http://localhost:3000', {
+        this.socket = io(window.location.origin, {
             transports: ['websocket'],
             autoConnect: true,
         });

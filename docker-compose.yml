@@ -1,13 +1,11 @@
 version: '3.8'
 services:
-    app:
+    server:
         build: .
         ports:
-            - '3000:3000'
+            - '80:3000'
         volumes:
             - ./config:/app/config
             - ./media:/app/media
         environment:
-            - PORT=3000
             - LOG_LEVEL=info
-        command: npm run start

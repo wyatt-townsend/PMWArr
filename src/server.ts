@@ -59,6 +59,29 @@ const startServer = async () => {
     app.use(notFoundHandler);
     app.use(errorHandler);
 
+    // Handle shutdown gracefully
+    // quit on ctrl-c when running docker in terminal
+    process.on('SIGINT', function onSigint() {
+        logger.info('Got SIGINT. Graceful shutdown');
+        shutdown();
+    });
+
+    // quit properly on docker stop
+    process.on('SIGTERM', function onSigterm() {
+        logger.info('Got SIGTERM. Graceful shutdown');
+        shutdown();
+    });
+
+    function shutdown() {
+        httpServer.close(function onServerClosed(err) {
+            if (err) {
+                logger.error(err);
+                process.exit(1);
+            }
+            process.exit(0);
+        });
+    }
+
     // Run the server
     httpServer.listen(3000, '0.0.0.0', () => logger.info(`Server is running on port ${3000}`));
 };
