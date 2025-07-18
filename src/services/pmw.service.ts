@@ -92,7 +92,6 @@ class PMWService {
             );
 
             if (!this.isSameDay(aired, target)) return; // Skip if date does not match target
-            console.log(`aired = ${aired.toISOString()}, target = ${target.toISOString()}`);
 
             vods.push({
                 title: title,
