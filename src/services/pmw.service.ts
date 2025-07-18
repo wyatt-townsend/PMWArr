@@ -1,41 +1,9 @@
 import axios from 'axios';
 import * as fs from 'fs';
 import * as cheerio from 'cheerio';
-import ffmpegPath from 'ffmpeg-static';
-import ffmpeg from 'fluent-ffmpeg';
 import { config } from '../utils/config.util.js';
 import { VodDto, Vod, VodState } from '../models/vod.model.js';
-import { logger } from '../utils/logger.util.js';
-import path from 'path';
-
-ffmpeg.setFfmpegPath(ffmpegPath);
-
-async function writeMp4Title(filePath: string, title: string): Promise<void> {
-    const dir = path.dirname(filePath);
-    const tempFilePath = path.join(dir, `temp_${path.basename(filePath)}`);
-
-    logger.debug(`Writing MP4 title metadata to ${filePath} with title "${title}"`);
-    await new Promise((resolve, reject) => {
-        ffmpeg(filePath)
-            .outputOptions('-metadata', `title=${title}`, '-codec', 'copy')
-            .on('end', () => {
-                logger.debug(`MP4 title metadata written successfully to ${filePath}`);
-                resolve(null);
-            })
-            .on('error', (err) => {
-                logger.error(`Error writing MP4 title metadata: ${err.message}`);
-                reject(err);
-            })
-            .save(tempFilePath);
-    });
-
-    fs.rename(tempFilePath, filePath, (err) => {
-        if (err) {
-            logger.error(`Error renaming temp file: ${err.message}`);
-            throw err;
-        }
-    });
-}
+import MediaService from './media.service.js';
 
 class PMWService {
     private static url: string = 'https://archive.wubby.tv/vods/public/';
@@ -65,6 +33,13 @@ class PMWService {
     static parseFileSize(size: string): number {
         // Example: "1.2 GiB" or "500 MiB"
         const sizeParts = size.split(' ');
+
+        if (sizeParts.length < 1) {
+            return 0; // Return 0 if size is empty or invalid
+        } else if (sizeParts.length == 1) {
+            return parseFloat(sizeParts[0]);
+        }
+
         const value = parseFloat(sizeParts[0]);
         const unit = sizeParts[1].toUpperCase();
 
@@ -164,7 +139,7 @@ class PMWService {
             target.state = VodState.Downloaded;
 
             // Set MP4 title metadata using ffmpeg
-            await writeMp4Title(filePath, target.title);
+            await MediaService.writeMp4Title(filePath, target.title);
         } catch {
             target.videoFileLocation = undefined;
             target.state = VodState.Error;
