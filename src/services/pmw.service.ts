@@ -57,7 +57,14 @@ class PMWService {
 
     static async sync(target: Date): Promise<VodDto[]> {
         const url = this.getUrlByDate(target);
-        const response = await axios.get(url);
+        let response;
+
+        try {
+            response = await axios.get(url, { timeout: 30000 }); // 30 seconds timeout
+        } catch {
+            return []; // Return empty array if request fails
+        }
+
         if (response.status !== 200) {
             throw new Error(`Failed to fetch data from ${url}`);
         }
@@ -123,12 +130,16 @@ class PMWService {
         fs.mkdirSync(outputDirectory, { recursive: true });
 
         const filePath = outputDirectory + this.getFileName(target);
-
         const writer = fs.createWriteStream(filePath);
-        const response = await axios.get(target.url, { responseType: 'stream' });
-        response.data.pipe(writer);
 
         try {
+            const response = await axios.get(target.url, {
+                responseType: 'stream',
+                timeout: 30000, // 30 seconds timeout
+            });
+
+            response.data.pipe(writer);
+
             await new Promise<void>((resolve, reject) => {
                 writer.on('finish', resolve);
                 writer.on('error', reject);
@@ -140,6 +151,11 @@ class PMWService {
             // Set MP4 title metadata using ffmpeg
             await MediaService.writeMp4Title(filePath, target.title);
         } catch {
+            // Clean up incomplete download
+            if (fs.existsSync(filePath)) {
+                fs.unlinkSync(filePath); // Remove the file if download fails
+            }
+
             target.videoFileLocation = undefined;
             target.state = VodState.Error;
         }

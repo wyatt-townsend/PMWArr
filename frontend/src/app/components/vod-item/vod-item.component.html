@@ -3,11 +3,11 @@
     <span class="state" [attr.data-state]="info().state"></span>
 </div>
 <div *ngIf="expanded" class="dropdown">
-    <div><strong>Published:</strong> {{ info().published | date: 'medium' }}</div>
+    <div><strong>Aired:</strong> {{ info().aired | date: 'short' }}</div>
     @if (info().videoFileLocation) {
-        <div><strong>File Path:</strong> {{ info().videoFileLocation }} bytes</div>
+        <div><strong>File Path:</strong> {{ info().videoFileLocation }}</div>
     }
-    <div><strong>File Size:</strong> {{ info().fileSize | number }} bytes</div>
+    <div><strong>File Size:</strong> {{ info().fileSize | fileSize }}</div>
     <div><strong>State:</strong> {{ info().state }}</div>
     @if (info().state === VodState.Downloaded) {
         <button (click)="doDownload()">Re-Download</button>
