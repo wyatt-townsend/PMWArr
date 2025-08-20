@@ -16,7 +16,9 @@ export class NotificationService implements OnDestroy {
     private notificationSubject = new Subject<Notification>();
 
     constructor() {
-        this.socket = io(window.location.origin, {
+        const backendUrl = `http://${window.location.hostname}:3000`;
+
+        this.socket = io(backendUrl, {
             transports: ['websocket'],
             autoConnect: true,
         });

@@ -54,6 +54,7 @@ class JobService {
         logger.debug(`Starting download job for VOD ID: ${id}`);
 
         const vodService = new VodService();
+        let updatedVod;
 
         try {
             const target = await vodService.findVodById(id);
@@ -63,26 +64,27 @@ class JobService {
                 message: `Downloading ${target.title}`,
             });
 
+            // Update the vod status to downloading
             target.state = VodState.Downloading;
             await vodService.updateVod(target);
 
-            try {
-                const updatedVod = await PMWService.download(target);
-                logger.debug(`Downloaded VOD with ID: ${updatedVod.id}`);
+            // Download
+            updatedVod = await PMWService.download(target);
 
+            if (updatedVod.state === VodState.Downloaded) {
+                // Success
+                logger.debug(`Downloaded VOD with ID: ${updatedVod.id}`);
                 NotificationService.notify(NotificationTopic.DOWNLOAD, {
                     type: NotificationType.SUCCESS,
                     message: `Finished downloading ${target.title}`,
                 });
-                return vodService.updateVod(updatedVod);
-            } catch (error) {
-                logger.error(`Error downloading VOD with ID ${target.id}: ${error.message}`);
+            } else {
+                // Failed
+                logger.error(`Error downloading VOD with ID ${target.id}`);
                 NotificationService.notify(NotificationTopic.DOWNLOAD, {
                     type: NotificationType.ERROR,
                     message: `Failed downloading ${target.title}`,
                 });
-                target.state = VodState.Error;
-                return vodService.updateVod(target);
             }
         } catch (error) {
             NotificationService.notify(NotificationTopic.DOWNLOAD, {
@@ -95,6 +97,8 @@ class JobService {
                 ErrorCode.INTERNAL_SERVER_ERROR,
             );
         }
+
+        return vodService.updateVod(updatedVod);
     }
 }
 

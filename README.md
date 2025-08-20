@@ -41,7 +41,7 @@ PMWArr is a full-stack web application designed for managing and scheduling VOD 
 
 ## Configuration
 
-- Environment variables and settings can be managed in the backend and frontend config files.
+- Environment variables and settings can be managed in the backend config file.
 
 ---
 

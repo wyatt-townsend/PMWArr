@@ -11,7 +11,7 @@ const transport = pino.transport({
         },
         {
             level: config.LOG_LEVEL,
-            target: 'pino/file',
+            target: 'pino-pretty',
         },
     ],
 });

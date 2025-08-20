@@ -60,7 +60,7 @@ class PMWService {
         let response;
 
         try {
-            response = await axios.get(url, { timeout: 30000 }); // 30 seconds timeout
+            response = await axios.get(url, { timeout: 5000 }); // 5 seconds timeout
         } catch {
             return []; // Return empty array if request fails
         }
@@ -135,7 +135,7 @@ class PMWService {
         try {
             const response = await axios.get(target.url, {
                 responseType: 'stream',
-                timeout: 30000, // 30 seconds timeout
+                timeout: 5000, // 5 seconds timeout
             });
 
             response.data.pipe(writer);
